@@ -1,0 +1,90 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+{% if user.is_authenticated %}  
+    <div class="container">
+        {% if message %}
+        <h4 class="message">{{message}}</h4>
+        {% endif %}
+  
+        {% for post in page_obj %}
+        <div class="container">
+            <div class="card border-secondary mb-3 post-object{{post.id}}">
+              <div class="card-header d-flex align-items-center">
+                <h2 class=""><a href="{% url 'profile' post.user.username %} ">{{post.user|title}}</a></h2>
+                <small class="  "> ({{post.date}})</small>
+              </div>
+              
+              <div class="card-body text-secondary">
+      
+                <p class="card-text post-object-content{{post.id}}">{{post.content}}</p>
+                  <div class="d-flex justify-content-between">
+                    {% if user.is_authenticated %}
+                        {% if request.user in post.liked.all %}
+                        <div class="">
+                          <a class="like" href="#" data-postid="{{ post.id }}" id="{{post.id}}" data-total="{{post.liked.all.count}}"  data-value="Unlike" value="submit">
+                            <i class="far fa-thumbs-up" id="like{{post.id}}" style="color:red;"></i>
+                            <span id="liked{{post.id}}"> {{post.liked.all.count}}</span>
+                          </a>
+                        </div>
+                          {% else %}
+                        <div class="">
+                          <a class="like" href="#" data-postid="{{ post.id }}" id="{{post.id}}" data-total="{{post.liked.all.count}}"  data-value="Like" value="submit">
+                            <i class="far fa-thumbs-up" id="like{{post.id}}" style="color:black;"></i>
+                            <span id="liked{{post.id}}"> {{post.liked.all.count}}</span>
+                          </a>
+                        </div>
+          
+                        {% endif %}
+                        {% if request.user == post.user %}
+                        <div class="float-right">
+                          <button type="button" class="btn btn-success" id="edit-button" data-content="{{post.content}}" data-postid="{{post.id}}" data-toggle="modal" data-target="#edit">Edit</button>
+                        </div>
+          
+                        {% endif %}
+                    {% else %}
+                        <a class="like" href="#" data-postid="{{ post.id }}" id="{{post.id}}" data-total="{{post.liked.all.count}}"  data-value="Unlike" value="submit">
+                          <i class="far fa-thumbs-up" id="like{{post.id}}" style="color:black;"></i>
+                          <span id="liked{{post.id}}"> {{post.liked.all.count}}</span>
+                        </a>
+                    {% endif %}
+                  </div>
+          
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+    <hr>
+    {% if not message %}
+    <div class="container">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a href="?page=1" class="page-link">&laquo; First</a></li>
+                <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a></li>
+            {% else %}
+            <li class="page-item disabled"><a class="page-link">&laquo; First</a></li>
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+            {% endif %}
+                
+            {% if page_obj.number %}
+            <li class="page-item"><a class="page-link">{{ page_obj.number }}</a></li>
+            {% else %}
+            <li class="page-item"><a class="page-link">0</a></li>
+            {% endif %}
+        
+            {% if page_obj.has_next %}
+            <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a></li>
+            <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a></li>
+            {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+            <li class="page-item disabled"><a class="page-link">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+  {% else %}
+    <h3>Please login to view the page</h3>
+  {% endif %}    
+{% endblock %}
